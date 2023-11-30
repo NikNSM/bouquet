@@ -4,7 +4,18 @@ import { ImageSlider } from "./utils/image-slider";
 import { iosVhFix } from "./utils/ios-vh-fix";
 import { modals, initModals } from "./modals/init-modals";
 
+import ModelApiService from './model/model-api-service.js';
+import Model from './model/model.js';
+import MainPresenter from "./presenters/main-presenter.js";
+
+const END_POINT = 'https://grading.objects.pages.academy/flowers-shop'
+const AUTHORIZATION = 'Basic djfkldjs230021';
 // Ваши импорты...
+
+const modelApiService = new ModelApiService (END_POINT, AUTHORIZATION);
+const model = new Model ({modelApiService})
+const mainPresenter = new MainPresenter({model})
+model.init();
 
 // Код для работы попапов, не удаляйте его
 window.addEventListener("DOMContentLoaded", () => {
@@ -33,3 +44,4 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // Ваш код...
 });
+
