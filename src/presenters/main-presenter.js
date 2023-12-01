@@ -1,3 +1,4 @@
+import WrapperView from '../view/wrapper-view.js';
 import MissionView from '../view/mission-view.js';
 import AdvantagesView from '../view/advantages -view.js';
 import HeaderCountView from '../view/header-count-view.js';
@@ -5,6 +6,7 @@ import { UpdateType } from '../utils/const.js';
 import { render, replace } from '../framework/render.js';
 
 export default class MainPresenter {
+  #wrapperView = new WrapperView();
   #missionView = new MissionView();
   #advatagesView = new AdvantagesView();
   #headerCountView = null;
@@ -28,6 +30,7 @@ export default class MainPresenter {
 
   init() {
     this.#renderHeaderCount();
+    render(this.#wrapperView, this.#mainContainer)
     render(this.#missionView, this.#mainContainer);
     render(this.#advatagesView, this.#mainContainer);
   }
