@@ -2,4 +2,12 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
-export {UpdateType}
+const TypeBouquet = {
+  birthdayboy: 'имениннику',
+  forlove: 'любимой',
+  bridge:'невесте',
+  colleagues:'коллеги',
+  motherday:'маме'
+}
+
+export {UpdateType, TypeBouquet}

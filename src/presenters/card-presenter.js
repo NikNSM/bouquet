@@ -1,0 +1,31 @@
+import { replace, render } from "../framework/render";
+import CardBouquetView from "../view/card-bouquet-view";
+
+export default class CardPresenter {
+  #cardBouqueteComponent= null
+  #isFavorite = null;
+  #bouqute = {};
+  #cardContainer = null;
+  constructor({cardContainer}) {
+    this.#cardContainer = cardContainer.element;
+  }
+
+  init(bouqute, deferedBouquetsId) {
+    this.#bouqute = bouqute
+    this.#isFavorite = deferedBouquetsId.some((item) => item === this.#bouqute.id)
+
+    const prevCardBouqueteComponent = this.#cardBouqueteComponent;
+
+    this.#cardBouqueteComponent = new CardBouquetView ({
+      favorite: this.#isFavorite,
+      bouquet: this.#bouqute
+    })
+
+    if(prevCardBouqueteComponent === null) {
+      render(this.#cardBouqueteComponent, this.#cardContainer)
+      return;
+    }
+
+    replace(this.#cardBouqueteComponent, prevCardBouqueteComponent)
+  }
+}

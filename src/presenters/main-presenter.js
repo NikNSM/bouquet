@@ -3,23 +3,28 @@ import MissionView from '../view/mission-view.js';
 import AdvantagesView from '../view/advantages -view.js';
 import HeaderCountView from '../view/header-count-view.js';
 import FilterPresenter from './filter-presenter.js';
+import CardBouquetView from '../view/card-bouquet-view.js';
+import ListBouquetsView from '../view/list-bouquets-view.js';
+import ContainerCatalogView from '../view/container-catalog-view.js';
+import CardPresenter from './card-presenter.js';
 import { UpdateType } from '../utils/const.js';
-import { render, replace } from '../framework/render.js';
+import { render, replace, remove } from '../framework/render.js';
 
 export default class MainPresenter {
   #wrapperView = new WrapperView();
   #missionView = new MissionView();
   #advatagesView = new AdvantagesView();
+  #containerCatalog = new ContainerCatalogView()
+  #listBouquets = new ListBouquetsView()
+  #model = null;
   #filterPresenter = null;
   #headerCountView = null;
   #headerCountContainer = null;
   #mainContainer = null
+  #cardsBouquetsPresenters = new Map()
   #bouquets = [];
   #delayedBouquetsId = []
-  #delayedBouquets = {
-
-  }
-  #model = null;
+  #delayedBouquets = {}
 
 
   constructor({model, mainContainer, headerCountContainer}) {
@@ -37,6 +42,7 @@ export default class MainPresenter {
     render(this.#missionView, this.#mainContainer);
     render(this.#advatagesView, this.#mainContainer);
     this.#filterPresenter.init();
+    this.#renderListBouquets()
   }
 
   #renderHeaderCount () {
@@ -50,6 +56,24 @@ export default class MainPresenter {
     replace(this.#headerCountView, prevHeaderCountView)
   }
 
+  #renderContainerCatalog () {
+    render(this.#containerCatalog, this.#mainContainer)
+  }
+
+  #renderListBouquets () {
+    this.#renderContainerCatalog();
+    const container = this.#containerCatalog.element.querySelector('.container')
+    render(this.#listBouquets, container)
+    this.#bouquets.forEach(this.#renderCardBouquet)
+  }
+
+  #renderCardBouquet = (bouquet, favoriteBuquets) => {
+    const bouquetPresenter = new CardPresenter ({
+      cardContainer: this.#listBouquets
+    }) ;
+    this.#cardsBouquetsPresenters.set(bouquet.id, bouquetPresenter)
+    bouquetPresenter.init(bouquet, this.#delayedBouquetsId)
+  }
 
   #getBouquets(data){
     console.log('23')
@@ -68,8 +92,15 @@ export default class MainPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.INIT:
-        console.log(data)
-        this.#getBouquets(data)
+        console.log('1')
+        this.#getBouquets(data);
+        console.log('2')
+        remove(this.#listBouquets);
+        remove(this.#containerCatalog)
+        console.log('3')
+        this.#renderHeaderCount()
+        console.log('4')
+        this.#renderListBouquets();
         break
     }
   }
