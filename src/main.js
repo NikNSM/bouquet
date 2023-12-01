@@ -10,12 +10,14 @@ import MainPresenter from "./presenters/main-presenter.js";
 
 const END_POINT = 'https://grading.objects.pages.academy/flowers-shop'
 const AUTHORIZATION = 'Basic djfkldjs230021';
-// Ваши импорты...
 
+const mainContainer = document.querySelector('main')
+const headerCountContainer = document.querySelector('.header__container')
 const modelApiService = new ModelApiService (END_POINT, AUTHORIZATION);
 const model = new Model ({modelApiService})
-const mainPresenter = new MainPresenter({model})
+const mainPresenter = new MainPresenter({model, mainContainer, headerCountContainer})
 model.init();
+mainPresenter.init();
 
 // Код для работы попапов, не удаляйте его
 window.addEventListener("DOMContentLoaded", () => {

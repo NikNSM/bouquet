@@ -13,7 +13,7 @@ export default class Model extends Observable {
     return this.#bouquets
   }
 
-  async init () {
+  async init() {
     try {
       const bouquets = await this.#modelApiService.bouquets
       const delayedBouquets = await this.#modelApiService.delayedBouquets
@@ -22,9 +22,10 @@ export default class Model extends Observable {
         bouquets: [...bouquets],
         delayedBouquets: {...delayedBouquets}
       }
+
       this._notify(UpdateType.INIT, this.#bouquets);
     } catch (err) {
-      console.log('2')
+      console.log('Ошибка')
       this.#bouquets = {}
     }
   }
