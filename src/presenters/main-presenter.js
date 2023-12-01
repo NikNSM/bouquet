@@ -2,6 +2,7 @@ import WrapperView from '../view/wrapper-view.js';
 import MissionView from '../view/mission-view.js';
 import AdvantagesView from '../view/advantages -view.js';
 import HeaderCountView from '../view/header-count-view.js';
+import FilterPresenter from './filter-presenter.js';
 import { UpdateType } from '../utils/const.js';
 import { render, replace } from '../framework/render.js';
 
@@ -9,6 +10,7 @@ export default class MainPresenter {
   #wrapperView = new WrapperView();
   #missionView = new MissionView();
   #advatagesView = new AdvantagesView();
+  #filterPresenter = null;
   #headerCountView = null;
   #headerCountContainer = null;
   #mainContainer = null
@@ -24,6 +26,7 @@ export default class MainPresenter {
     this.#model = model
     this.#mainContainer = mainContainer
     this.#headerCountContainer = headerCountContainer
+    this.#filterPresenter = new FilterPresenter({mainContainer: this.#mainContainer})
 
     this.#model.addObserver(this.#handleModelEvent)
   }
@@ -33,6 +36,7 @@ export default class MainPresenter {
     render(this.#wrapperView, this.#mainContainer)
     render(this.#missionView, this.#mainContainer);
     render(this.#advatagesView, this.#mainContainer);
+    this.#filterPresenter.init();
   }
 
   #renderHeaderCount () {
@@ -45,6 +49,7 @@ export default class MainPresenter {
 
     replace(this.#headerCountView, prevHeaderCountView)
   }
+
 
   #getBouquets(data){
     console.log('23')
