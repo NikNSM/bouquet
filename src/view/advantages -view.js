@@ -35,7 +35,7 @@ function createAdvantagesTemplate () {
       </div>
     </div>
   </section>
-  `
+  `;
 }
 
 export default class AdvantagesView extends AbstractView {

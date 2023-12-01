@@ -8,6 +8,6 @@ const TypeBouquet = {
   bridge:'невесте',
   colleagues:'коллеги',
   motherday:'маме'
-}
+};
 
-export {UpdateType, TypeBouquet}
+export {UpdateType, TypeBouquet};

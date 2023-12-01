@@ -7,7 +7,7 @@ function createFilterTypeContainerViewTemplate () {
       <h2 class="title title--h3 filter-reason__title">Выберите повод для букета</h2>
     </div>
   </section>
-  `
+  `;
 }
 
 export default class FilterTypeContainerView extends AbstractView {

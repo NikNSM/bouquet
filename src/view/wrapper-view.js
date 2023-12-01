@@ -18,7 +18,7 @@ function createWrapperViewTemplate () {
         </a>
       </div>
     </div>
-  </section>`
+  </section>`;
 }
 
 export default class WrapperView extends AbstractView {

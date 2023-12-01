@@ -19,7 +19,8 @@ function createCardBouquetView (bouquet, favorite) {
         </svg>
       </button>
       <picture>
-        <source type="image/webp" srcset="${previewImage}"><img src="${previewImage}"  width="244" height="412" alt="item-delicate-irises">
+      <source type="image/webp" srcset="${previewImage} 2x">
+      <img src="${previewImage}" srcset="${previewImage} 2x" height="412" width="244"  alt="item-${title}">
       </picture>
       </div>
         <div class="item-card__desc-wrap">
@@ -29,7 +30,7 @@ function createCardBouquetView (bouquet, favorite) {
         <p class="text text--size-20 item-card__desc">${description.length > maxLengthDescription ? `${description.slice(0, maxLengthDescription)}...` : description }</p>
     </div>
   </li>
-  `
+  `;
 }
 
 
@@ -40,7 +41,7 @@ export default class CardBouquetView extends AbstractView {
   constructor ({favorite, bouquet}) {
     super();
     this.#isFavorite = favorite;
-    this.#bouquet = bouquet
+    this.#bouquet = bouquet;
   }
 
   get template () {

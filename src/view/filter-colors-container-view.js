@@ -7,7 +7,7 @@ function createFilterColorsContainerViewTemplate () {
       <h2 class="title title--h3 filter-color__title">Выберите основной цвет для букета</h2>
     </div>
   </section>
-  `
+  `;
 }
 
 export default class FilterColorsContainerView extends AbstractView {

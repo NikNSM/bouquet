@@ -3,105 +3,129 @@ import MissionView from '../view/mission-view.js';
 import AdvantagesView from '../view/advantages -view.js';
 import HeaderCountView from '../view/header-count-view.js';
 import FilterPresenter from './filter-presenter.js';
-import CardBouquetView from '../view/card-bouquet-view.js';
 import ListBouquetsView from '../view/list-bouquets-view.js';
 import ContainerCatalogView from '../view/container-catalog-view.js';
+import ButtonMoreBouquetsView from '../view/button-more bouquets-view.js';
 import CardPresenter from './card-presenter.js';
 import { UpdateType } from '../utils/const.js';
 import { render, replace, remove } from '../framework/render.js';
 
+const BOUQUETS_COUNT = 6;
 export default class MainPresenter {
   #wrapperView = new WrapperView();
   #missionView = new MissionView();
   #advatagesView = new AdvantagesView();
-  #containerCatalog = new ContainerCatalogView()
-  #listBouquets = new ListBouquetsView()
+  #containerCatalog = new ContainerCatalogView();
+  #listBouquets = new ListBouquetsView();
+  #buttonMoreBouquets = null;
   #model = null;
   #filterPresenter = null;
   #headerCountView = null;
   #headerCountContainer = null;
-  #mainContainer = null
-  #cardsBouquetsPresenters = new Map()
+  #mainContainer = null;
+  #cardsBouquetsPresenters = new Map();
   #bouquets = [];
-  #delayedBouquetsId = []
-  #delayedBouquets = {}
+  #delayedBouquetsId = [];
+  #delayedBouquets = {};
+  #renderBouquetsCount = BOUQUETS_COUNT;
 
 
   constructor({model, mainContainer, headerCountContainer}) {
-    this.#model = model
-    this.#mainContainer = mainContainer
-    this.#headerCountContainer = headerCountContainer
-    this.#filterPresenter = new FilterPresenter({mainContainer: this.#mainContainer})
+    this.#model = model;
+    this.#mainContainer = mainContainer;
+    this.#headerCountContainer = headerCountContainer;
+    this.#filterPresenter = new FilterPresenter({mainContainer: this.#mainContainer});
 
-    this.#model.addObserver(this.#handleModelEvent)
+    this.#model.addObserver(this.#handleModelEvent);
   }
 
   init() {
     this.#renderHeaderCount();
-    render(this.#wrapperView, this.#mainContainer)
+    render(this.#wrapperView, this.#mainContainer);
     render(this.#missionView, this.#mainContainer);
     render(this.#advatagesView, this.#mainContainer);
     this.#filterPresenter.init();
-    this.#renderListBouquets()
+    this.#renderListBouquets();
   }
 
   #renderHeaderCount () {
-    const prevHeaderCountView = this.#headerCountView
-    this.#headerCountView = new HeaderCountView({delayedBouquets: this.#delayedBouquets})
+    const prevHeaderCountView = this.#headerCountView;
+    this.#headerCountView = new HeaderCountView({delayedBouquets: this.#delayedBouquets});
     if(prevHeaderCountView === null) {
       render(this.#headerCountView, this.#headerCountContainer);
       return;
     }
 
-    replace(this.#headerCountView, prevHeaderCountView)
+    replace(this.#headerCountView, prevHeaderCountView);
   }
 
   #renderContainerCatalog () {
-    render(this.#containerCatalog, this.#mainContainer)
+    render(this.#containerCatalog, this.#mainContainer);
   }
 
   #renderListBouquets () {
+    const bouquetsCount = this.#bouquets.length;
+    const bouquets = this.#bouquets.slice(0, Math.min(bouquetsCount, this.#renderBouquetsCount));
+
     this.#renderContainerCatalog();
-    const container = this.#containerCatalog.element.querySelector('.container')
-    render(this.#listBouquets, container)
-    this.#bouquets.forEach(this.#renderCardBouquet)
+    const container = this.#containerCatalog.element.querySelector('.container');
+
+    render(this.#listBouquets, container);
+    bouquets.forEach(this.#renderCardBouquet);
+
+    if(this.#renderBouquetsCount < bouquetsCount) {
+      this.#renderButtonMoreBouquets();
+    }
   }
 
-  #renderCardBouquet = (bouquet, favoriteBuquets) => {
+  #renderCardBouquet = (bouquet) => {
     const bouquetPresenter = new CardPresenter ({
       cardContainer: this.#listBouquets
     }) ;
-    this.#cardsBouquetsPresenters.set(bouquet.id, bouquetPresenter)
-    bouquetPresenter.init(bouquet, this.#delayedBouquetsId)
+    this.#cardsBouquetsPresenters.set(bouquet.id, bouquetPresenter);
+    bouquetPresenter.init(bouquet, this.#delayedBouquetsId);
+  };
+
+  #renderButtonMoreBouquets () {
+    this.#buttonMoreBouquets = new ButtonMoreBouquetsView ({
+      onClickButtonMoreBouquets: this.#handleClickButtonMOreBouquets
+    });
+
+    render(this.#buttonMoreBouquets, this.#mainContainer);
   }
 
+  #handleClickButtonMOreBouquets = () => {
+    const bouquetsCount = this.#bouquets.length;
+    const newBouquetsCount = Math.min(bouquetsCount, this.#renderBouquetsCount + BOUQUETS_COUNT);
+    const bouquets = this.#bouquets.slice(this.#renderBouquetsCount, newBouquetsCount);
+
+    bouquets.forEach(this.#renderCardBouquet);
+
+    this.#renderBouquetsCount = newBouquetsCount;
+
+    if (this.#renderBouquetsCount >= bouquetsCount) {
+      remove(this.#buttonMoreBouquets);
+    }
+  };
+
   #getBouquets(data){
-    console.log('23')
-    console.log(data.bouquets)
-    this.#bouquets = data.bouquets
+    this.#bouquets = data.bouquets;
 
     if(Object.keys(data.delayedBouquets).length !== 0) {
-      this.#delayedBouquetsId = Object.keys(data.delayedBouquets.products)
+      this.#delayedBouquetsId = Object.keys(data.delayedBouquets.products);
       this.#delayedBouquets = data.delayedBouquets;
-      console.log(this.#bouquets)
-      console.log(this.#delayedBouquetsId)
-      console.log(this.#delayedBouquets)
     }
   }
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.INIT:
-        console.log('1')
         this.#getBouquets(data);
-        console.log('2')
         remove(this.#listBouquets);
-        remove(this.#containerCatalog)
-        console.log('3')
-        this.#renderHeaderCount()
-        console.log('4')
+        remove(this.#containerCatalog);
+        this.#renderHeaderCount();
         this.#renderListBouquets();
-        break
+        break;
     }
-  }
+  };
 }

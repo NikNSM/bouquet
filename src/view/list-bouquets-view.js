@@ -4,7 +4,7 @@ function createListBouquetsView () {
   return `
   <ul class="catalogue__list">
   </ul>
-  `
+  `;
 }
 export default class ListBouquetsView extends AbstractView {
   get template () {

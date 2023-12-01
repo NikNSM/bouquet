@@ -19,11 +19,11 @@ function createMissionTemplate() {
     </div>
   </div>
 </section>
-  `
+  `;
 }
 
 export default class MissionView extends AbstractView {
   get template() {
-    return createMissionTemplate()
+    return createMissionTemplate();
   }
 }

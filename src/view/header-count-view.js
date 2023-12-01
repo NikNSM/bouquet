@@ -1,7 +1,7 @@
-import AbstractView from '../framework/view/abstract-view.js'
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createHeaderCountTemplate (delayedBouquets) {
-  const lengthDelayedBouquets = Object.keys(delayedBouquets).length
+  const lengthDelayedBouquets = Object.keys(delayedBouquets).length;
   return `
   <div class="header-count">
     <button class="header-count__btn" type="button">
@@ -16,17 +16,17 @@ function createHeaderCountTemplate (delayedBouquets) {
       <p class="text text--size-20 header-count__text">сумма</p><b class="price price--size-min header-count__price">${lengthDelayedBouquets === 0 ? '0' : delayedBouquets.sum}<span>Р</span></b>
     </div>
   </div>
-  `
+  `;
 }
 
 export default class HeaderCountView extends AbstractView {
-  #delayedBouquets = {}
+  #delayedBouquets = {};
   constructor({delayedBouquets}){
     super();
-    this.#delayedBouquets = delayedBouquets
+    this.#delayedBouquets = delayedBouquets;
   }
 
   get template() {
-    return createHeaderCountTemplate(this.#delayedBouquets)
+    return createHeaderCountTemplate(this.#delayedBouquets);
   }
 }

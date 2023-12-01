@@ -49,7 +49,7 @@ function createFilterColorsViewTemplate () {
     </div>
     <button class="visually-hidden" type="submit" tabindex="-1">применить фильтр</button>
   </form>
-  `
+  `;
 }
 
 export default class FilterColorsView extends AbstractView {

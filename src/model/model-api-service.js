@@ -17,14 +17,14 @@ export default class ModelApiService extends ApiService {
     return this._load ({
       url: 'cart'
     })
-      .then(ApiService.parseResponse)
+      .then(ApiService.parseResponse);
   }
 
   async getBouquet (bouquet) {
     return this._load({
       url: `products/${bouquet}`
     })
-    .then(ApiService.parseResponse)
+      .then(ApiService.parseResponse);
   }
 
   async addBouquetsOfDeferred (bouquetId) {

@@ -31,7 +31,7 @@ function createFilterTypeTemplate() {
   </div>
   <button class="filter-reason__btn visually-hidden" type="submit" tabindex="-1">применить фильтр</button>
   </form>
-  `
+  `;
 }
 
 export default class FilterTypeView extends AbstractView {

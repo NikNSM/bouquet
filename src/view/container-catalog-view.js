@@ -20,7 +20,7 @@ function createContainerCatalogView () {
       </div>
     </div>
   </div>
-  `
+  `;
 }
 
 export default class ContainerCatalogView extends AbstractView {
