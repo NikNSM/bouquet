@@ -14,7 +14,7 @@ function createSliderImagePopupTemplate(images, authorPhoto) {
 }
 
 function createPopupBouquetViewTemplate(bouquet) {
-  const {images, authorPhoto} = bouquet;
+  const { images, authorPhoto } = bouquet;
   return `
   <div class="image-slider swiper modal-product__slider">
     <div class="image-slides-list swiper-wrapper">
@@ -38,7 +38,7 @@ export default class PopupBouquetView extends AbstractView {
   #bouquet = {};
   #handleClosePopup = null;
 
-  constructor({bouquet, onClickClosePopup}) {
+  constructor({ bouquet, onClickClosePopup }) {
     super();
     this.#bouquet = bouquet;
     this.#handleClosePopup = onClickClosePopup;

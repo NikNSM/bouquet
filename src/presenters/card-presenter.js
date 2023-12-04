@@ -1,5 +1,7 @@
 import { replace, render, remove } from '../framework/render.js';
 import { UpdateType, UserAction } from '../utils/const.js';
+import { ImageSlider } from '../utils/image-slider.js';
+import { initModals } from '../modals/init-modals.js';
 import CardBouquetView from '../view/card-bouquet-view.js';
 import PopupBouquetSliderView from '../view/popup-bouquet-slider-view.js';
 import PopupBouquetDescriptionView from '../view/popup-bouqute -description-view.js';
@@ -39,7 +41,8 @@ export default class CardPresenter {
       favorite: this.#isFavorite,
       bouquet: this.#bouqute,
       onFavoriteClick: this.#handleFavoriteClick,
-      onClickOpenPopup: this.#clickOpenPopupHandler
+      onClickOpenPopup: this.#clickOpenPopupHandler,
+      initSlider: this.#initSlider
     });
 
     if (prevCardBouqueteComponent === null) {
@@ -78,6 +81,7 @@ export default class CardPresenter {
     }
     replace(this.#popupBouquetSlider, prevPopupBouquetSlider);
     replace(this.#popupBouquetDescription, prevPopupBouquetDescription);
+    this.#initSlider();
   };
 
   #removePopup = () => {
@@ -120,6 +124,14 @@ export default class CardPresenter {
       UpdateType.PATH,
       this.#bouqute.id,
     );
+  };
+
+  #initSlider = () => {
+    const imageSlider = new ImageSlider('.image-slider');
+    imageSlider.init();
+
+    // Инициализация попапов
+    initModals();
   };
 
   resetMode = () => {
