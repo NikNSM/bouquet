@@ -8,8 +8,9 @@ import ContainerCatalogView from '../view/container-catalog-view.js';
 import ButtonMoreBouquetsView from '../view/button-more bouquets-view.js';
 import CardPresenter from './card-presenter.js';
 import SortingView from '../view/sorting-view.js';
-import { TypeSort, UpdateType } from '../utils/const.js';
+import { TypeSort, UpdateType, FilterType } from '../utils/const.js';
 import { render, replace, remove } from '../framework/render.js';
+import { filters } from '../utils/filter.js';
 
 const BOUQUETS_COUNT = 6;
 export default class MainPresenter {
@@ -18,6 +19,7 @@ export default class MainPresenter {
   #advatagesView = new AdvantagesView();
   #containerCatalog = new ContainerCatalogView();
   #listBouquets = new ListBouquetsView();
+  #filterModel = null;
   #sortComponent = null;
   #buttonMoreBouquets = null;
   #model = null;
@@ -33,13 +35,18 @@ export default class MainPresenter {
   #currentSortType = TypeSort.INCREASING
 
 
-  constructor({model, mainContainer, headerCountContainer}) {
+  constructor({model, filterModel, mainContainer, headerCountContainer}) {
     this.#model = model;
+    this.#filterModel = filterModel;
     this.#mainContainer = mainContainer;
     this.#headerCountContainer = headerCountContainer;
-    this.#filterPresenter = new FilterPresenter({mainContainer: this.#mainContainer});
+    this.#filterPresenter = new FilterPresenter({
+      mainContainer: this.#mainContainer,
+      filterModel: this.#filterModel
+    });
 
     this.#model.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent)
   }
 
   init() {
@@ -53,16 +60,20 @@ export default class MainPresenter {
 
   get bouquets () {
     const bouquets = [...this.#model.bouquets];
+    const filterEventType = this.#filterModel.filterEventType;
+    const filterColors = this.#filterModel.filterColors;
+    const filteredBouquets = filters(filterColors, filterEventType, bouquets)
+
     switch(this.#currentSortType){
       case TypeSort.INCREASING:
-        bouquets.sort((a, b) => a.price - b.price);
+        filteredBouquets.sort((a, b) => a.price - b.price);
         break;
       case TypeSort.DECREASING:
-        bouquets.sort((a, b) => b.price - a.price);
+        filteredBouquets.sort((a, b) => b.price - a.price);
         break;
     }
 
-    return bouquets
+    return filteredBouquets
   }
 
   get favoriteBouquets () {
@@ -136,15 +147,18 @@ export default class MainPresenter {
     }
     console.log(sortType);
 
-    console.log('1')
     this.#currentSortType = sortType
     this.#clearListBouquets();
     this.#renderListBouquets()
   }
 
-  #clearListBouquets () {
+  #clearListBouquets ({resetSortType = false} = {}) {
     this.#cardsBouquetsPresenters.forEach((presenter) => presenter.destroy());
     this.#cardsBouquetsPresenters.clear();
+
+    if(resetSortType) {
+      this.#currentSortType = TypeSort.INCREASING
+    }
 
     remove(this.#listBouquets);
     remove(this.#buttonMoreBouquets);
@@ -169,11 +183,14 @@ export default class MainPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.INIT:
-        remove(this.#listBouquets);
         remove(this.#containerCatalog);
         this.#renderHeaderCount();
         this.#renderCatalogBouquets();
         break;
+      case UpdateType.MAJOR:
+        this.#clearListBouquets({resetSortType: true})
+        remove(this.#containerCatalog);
+        this.#renderCatalogBouquets();
     }
   };
 }

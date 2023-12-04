@@ -39,7 +39,6 @@ export default class SortingView extends AbstractView {
   #changeSortHandler = (evt) => {
     evt.preventDefault()
     if(evt.target.tagName !== 'svg' && evt.target.tagName !== 'use' && evt.target.tagName !== 'A') {
-      console.log(evt.target.tagName)
       return;
     }
 
