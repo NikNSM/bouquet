@@ -28,7 +28,6 @@ export default class ModelApiService extends ApiService {
   }
 
   async addBouquetFavorite (bouquetId) {
-    console.log(bouquetId);
     const response = await this._load({
       url: `products/${bouquetId}`,
       method: Method.PUT,

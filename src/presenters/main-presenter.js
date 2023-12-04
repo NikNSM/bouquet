@@ -131,7 +131,7 @@ export default class MainPresenter {
       onClickButtonMoreBouquets: this.#handleClickButtonMoreBouquets
     });
 
-    render(this.#buttonMoreBouquets, this.#mainContainer);
+    render(this.#buttonMoreBouquets, this.#listBouquetsContainer);
   }
 
   #renderSortComponent() {
