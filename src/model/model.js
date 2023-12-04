@@ -2,7 +2,8 @@ import Observable from '../framework/observable.js';
 import { UpdateType } from '../utils/const.js';
 
 export default class Model extends Observable {
-  #bouquets = {};
+  #bouquets = [];
+  #favoriteBouquets = {};
   #modelApiService = null;
   constructor({modelApiService}) {
     super();
@@ -13,19 +14,22 @@ export default class Model extends Observable {
     return this.#bouquets;
   }
 
+  get favoriteBouquets () {
+    return this.#favoriteBouquets
+  }
+
   async init() {
     try {
       const bouquets = await this.#modelApiService.bouquets;
-      const delayedBouquets = await this.#modelApiService.delayedBouquets;
+      const favoriteBouquets = await this.#modelApiService.delayedBouquets;
 
-      this.#bouquets = {
-        bouquets: [...bouquets],
-        delayedBouquets: {...delayedBouquets}
-      };
+      this.#bouquets = bouquets;
+      this.#favoriteBouquets = favoriteBouquets;
 
-      this._notify(UpdateType.INIT, this.#bouquets);
+      this._notify(UpdateType.INIT);
     } catch (err) {
-      this.#bouquets = {};
+      this.#bouquets = [];
+      this.#favoriteBouquets = {};
     }
   }
 }

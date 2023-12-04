@@ -10,8 +10,8 @@ import CardPresenter from './card-presenter.js';
 import SortingView from '../view/sorting-view.js';
 import { TypeSort, UpdateType } from '../utils/const.js';
 import { render, replace, remove } from '../framework/render.js';
+import { BOUQUETS_COUNT } from './main-presenter.js';
 
-const BOUQUETS_COUNT = 6;
 export default class MainPresenter {
   #wrapperView = new WrapperView();
   #missionView = new MissionView();
@@ -25,19 +25,17 @@ export default class MainPresenter {
   #headerCountView = null;
   #headerCountContainer = null;
   #mainContainer = null;
-  #listBouquetsContainer = null;
-  #sortContainer = null;
   #cardsBouquetsPresenters = new Map();
   #favoriteBouquetsId = [];
   #renderBouquetsCount = BOUQUETS_COUNT;
-  #currentSortType = TypeSort.INCREASING
+  #currentSort = TypeSort.INCREASING;
 
 
-  constructor({model, mainContainer, headerCountContainer}) {
+  constructor({ model, mainContainer, headerCountContainer }) {
     this.#model = model;
     this.#mainContainer = mainContainer;
     this.#headerCountContainer = headerCountContainer;
-    this.#filterPresenter = new FilterPresenter({mainContainer: this.#mainContainer});
+    this.#filterPresenter = new FilterPresenter({ mainContainer: this.#mainContainer });
 
     this.#model.addObserver(this.#handleModelEvent);
   }
@@ -51,33 +49,33 @@ export default class MainPresenter {
     this.#renderCatalogBouquets();
   }
 
-  get bouquets () {
+  get bouquets() {
     const bouquets = [...this.#model.bouquets];
-    switch(this.#currentSortType){
+    switch (this.#currentSort) {
       case TypeSort.INCREASING:
         bouquets.sort((a, b) => a.price - b.price);
         break;
       case TypeSort.DECREASING:
-        bouquets.sort((a, b) => b.price - a.price);
+        ((a, b) => b.price - a.price);
         break;
     }
 
-    return bouquets
+    return bouquets;
   }
 
-  get favoriteBouquets () {
+  get favoriteBouquets() {
     const favoriteBouquets = this.#model.favoriteBouquets;
-    if(Object.keys(favoriteBouquets).length !== 0){
-      this.#favoriteBouquetsId = Object.keys(favoriteBouquets.products)
+    if (Object.keys(data.delayedBouquets).length !== 0) {
+      this.#favoriteBouquetsId = Object.keys(favoriteBouquets.products);
     }
     return favoriteBouquets;
   }
 
-  #renderHeaderCount () {
+  #renderHeaderCount() {
     const prevHeaderCountView = this.#headerCountView;
-    const favoriteBouquets = this.favoriteBouquets
-    this.#headerCountView = new HeaderCountView({delayedBouquets: favoriteBouquets});
-    if(prevHeaderCountView === null) {
+    const favoriteBouquets = this.favoriteBouquets;
+    this.#headerCountView = new HeaderCountView({ delayedBouquets: favoriteBouquets });
+    if (prevHeaderCountView === null) {
       render(this.#headerCountView, this.#headerCountContainer);
       return;
     }
@@ -85,64 +83,53 @@ export default class MainPresenter {
     replace(this.#headerCountView, prevHeaderCountView);
   }
 
-  #renderCatalogBouquets  () {
+  #renderContainerCatalog() {
     render(this.#containerCatalog, this.#mainContainer);
-    this.#listBouquetsContainer = this.#containerCatalog.element.querySelector('.container');
-    this.#sortContainer = this.#listBouquetsContainer.querySelector('.catalogue__header');
-    this.#renderSortComponent();
-    this.#renderListBouquets()
   }
 
-  #renderListBouquets () {
+  #renderCatalogBouquets() {
     const bouquetsCount = this.bouquets.length;
     const bouquets = this.bouquets.slice(0, Math.min(bouquetsCount, this.#renderBouquetsCount));
 
-    render(this.#listBouquets, this.#listBouquetsContainer);
+    this.#renderContainerCatalog();
+    const container = this.#containerCatalog.element.querySelector('.container');
+    const sortContainer = container.querySelector('.catalogue__header');
+
+
+    render(this.#listBouquets, container);
     bouquets.forEach(this.#renderCardBouquet);
 
-    if(this.#renderBouquetsCount < bouquetsCount) {
+    if (this.#renderBouquetsCount < bouquetsCount) {
       this.#renderButtonMoreBouquets();
     }
   }
 
+
   #renderCardBouquet = (bouquet) => {
-    const bouquetPresenter = new CardPresenter ({
+    const bouquetPresenter = new CardPresenter({
       cardContainer: this.#listBouquets
-    }) ;
+    });
     this.#cardsBouquetsPresenters.set(bouquet.id, bouquetPresenter);
     bouquetPresenter.init(bouquet, this.#favoriteBouquetsId);
   };
 
-  #renderButtonMoreBouquets () {
-    this.#buttonMoreBouquets = new ButtonMoreBouquetsView ({
+  #renderButtonMoreBouquets() {
+    this.#buttonMoreBouquets = new ButtonMoreBouquetsView({
       onClickButtonMoreBouquets: this.#handleClickButtonMoreBouquets
     });
 
     render(this.#buttonMoreBouquets, this.#mainContainer);
   }
 
-  #renderSortComponent () {
-    this.#sortComponent = new SortingView ({
-      onChangeSort: this.#handleChangeSort
-    })
+  #renderSortComponent(sortContainer) {
+    this.#sortComponent = new SortingView({
+      onChangeSort:
+        });
 
-    render(this.#sortComponent, this.#sortContainer)
+    render(this.#sortComponent, sortContainer);
   }
 
-  #handleChangeSort = (sortType) => {
-    console.log(this.#currentSortType)
-    if(sortType === this.#currentSortType){
-      return;
-    }
-    console.log(sortType);
-
-    console.log('1')
-    this.#currentSortType = sortType
-    this.#clearListBouquets();
-    this.#renderListBouquets()
-  }
-
-  #clearListBouquets () {
+  #clearListBouquets() {
     this.#cardsBouquetsPresenters.forEach((presenter) => presenter.destroy());
     this.#cardsBouquetsPresenters.clear();
 
@@ -153,9 +140,9 @@ export default class MainPresenter {
   }
 
   #handleClickButtonMoreBouquets = () => {
-    const bouquetsCount = this.bouquets.length;
+    const bouquetsCount = this.#bouquets.length;
     const newBouquetsCount = Math.min(bouquetsCount, this.#renderBouquetsCount + BOUQUETS_COUNT);
-    const bouquets = this.bouquets.slice(this.#renderBouquetsCount, newBouquetsCount);
+    const bouquets = this.#bouquets.slice(this.#renderBouquetsCount, newBouquetsCount);
 
     bouquets.forEach(this.#renderCardBouquet);
 

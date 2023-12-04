@@ -10,4 +10,9 @@ const TypeBouquet = {
   motherday:'маме'
 };
 
-export {UpdateType, TypeBouquet};
+const TypeSort = {
+  INCREASING: 'возрастание',
+  DECREASING: 'убывание'
+}
+
+export {UpdateType, TypeBouquet, TypeSort};

@@ -1,4 +1,4 @@
-import { replace, render } from '../framework/render.js';
+import { replace, render, remove } from '../framework/render.js';
 import CardBouquetView from '../view/card-bouquet-view.js';
 
 export default class CardPresenter {
@@ -27,5 +27,9 @@ export default class CardPresenter {
     }
 
     replace(this.#cardBouqueteComponent, prevCardBouqueteComponent);
+  }
+
+  destroy(){
+    remove(this.#cardBouqueteComponent)
   }
 }
