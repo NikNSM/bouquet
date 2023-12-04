@@ -42,9 +42,9 @@ export default class FilterTypeView extends AbstractView {
   constructor({filter, onChangeFilter}) {
     super();
     this.#filter = filter;
-    this.#handleChangeFilter = onChangeFilter
+    this.#handleChangeFilter = onChangeFilter;
 
-    this.element.addEventListener('change', this.#changeFilterHandler)
+    this.element.addEventListener('change', this.#changeFilterHandler);
   }
 
   get template () {
@@ -53,7 +53,6 @@ export default class FilterTypeView extends AbstractView {
 
   #changeFilterHandler = (evt) => {
     evt.preventDefault();
-    console.log(evt.target.value)
-    this.#handleChangeFilter(evt.target.value)
-  }
+    this.#handleChangeFilter(evt.target.value);
+  };
 }

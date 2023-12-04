@@ -37,7 +37,7 @@ export default class SortingView extends AbstractView {
   }
 
   #changeSortHandler = (evt) => {
-    evt.preventDefault()
+    evt.preventDefault();
     if(evt.target.tagName !== 'svg' && evt.target.tagName !== 'use' && evt.target.tagName !== 'A') {
       return;
     }
@@ -47,5 +47,5 @@ export default class SortingView extends AbstractView {
     evt.target.closest('a').classList.add(classActiveSorting);
 
     this.#handleChangeSort(evt.target.dataset.typeSort);
-  }
+  };
 }

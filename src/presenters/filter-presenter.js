@@ -15,26 +15,26 @@ export default class FilterPresenter {
 
   constructor({mainContainer, filterModel}) {
     this.#mainContainer = mainContainer;
-    this.#filterModel = filterModel
+    this.#filterModel = filterModel;
 
-    this.#filterModel.addObserver(this.#handleEventModel)
+    this.#filterModel.addObserver(this.#handleEventModel);
   }
 
   init() {
-    this.#renderFilterEventType()
-    this.#renderFilterColors()
+    this.#renderFilterEventType();
+    this.#renderFilterColors();
   }
 
   #handleEventModel = () => {
     this.init();
-  }
+  };
 
   #renderFilterEventType () {
     const filter = this.#filterModel.filterEventType;
 
     render(this.#filterTypeContainer, this.#mainContainer);
     const listType = this.#filterTypeContainer.element.querySelector('.container');
-    const prevFilterTypeView = this.#filterTypeView
+    const prevFilterTypeView = this.#filterTypeView;
     this.#filterTypeView = new FilterTypeView({
       filter,
       onChangeFilter: this.#handleChangeFilterEventType
@@ -45,25 +45,25 @@ export default class FilterPresenter {
       return;
     }
 
-    replace(this.#filterTypeView, prevFilterTypeView)
+    replace(this.#filterTypeView, prevFilterTypeView);
   }
 
   #renderFilterColors () {
     const filters = [...this.#filterModel.filterColors];
     render(this.#filterColorsContainer, this.#mainContainer);
     const listColors = this.#filterColorsContainer.element.querySelector('.container');
-    const prevFilterColorsView = this.#filterColorsView
+    const prevFilterColorsView = this.#filterColorsView;
     this.#filterColorsView = new FilterColorsView({
       filters,
       onChangeFilter: this.#hanleChangeFiltersColors
     });
 
-    if(prevFilterColorsView=== null) {
+    if(prevFilterColorsView === null) {
       render(this.#filterColorsView, listColors);
       return;
     }
 
-    replace(this.#filterColorsView, prevFilterColorsView)
+    replace(this.#filterColorsView, prevFilterColorsView);
   }
 
   #handleChangeFilterEventType = (filterValue) => {
@@ -71,8 +71,8 @@ export default class FilterPresenter {
       return;
     }
 
-    this.#filterModel.setFilterEventType(UpdateType.MAJOR, filterValue)
-  }
+    this.#filterModel.setFilterEventType(UpdateType.MAJOR, filterValue);
+  };
 
   #hanleChangeFiltersColors = (filterValue) => {
     const filter = this.#filterModel.filterColors;
@@ -82,27 +82,27 @@ export default class FilterPresenter {
       }
 
       filter.clear();
-      filter.add(filterValue)
+      filter.add(filterValue);
 
-      this.#filterModel.setFilterColors(UpdateType.MAJOR, filter)
+      this.#filterModel.setFilterColors(UpdateType.MAJOR, filter);
       return;
     }
 
     if(filter.has(FilterColors.ALL)){
       filter.clear();
-      filter.add(filterValue)
+      filter.add(filterValue);
 
-      this.#filterModel.setFilterColors(UpdateType.MAJOR, filter)
+      this.#filterModel.setFilterColors(UpdateType.MAJOR, filter);
       return;
     }
 
     if(this.#filterModel.filterColors.has(filterValue)){
-      filter.delete(filterValue)
-      this.#filterModel.setFilterColors(UpdateType.MAJOR, filter)
+      filter.delete(filterValue);
+      this.#filterModel.setFilterColors(UpdateType.MAJOR, filter);
       return;
     }
 
-    filter.add(filterValue)
-    this.#filterModel.setFilterColors(UpdateType.MAJOR, filter)
-  }
+    filter.add(filterValue);
+    this.#filterModel.setFilterColors(UpdateType.MAJOR, filter);
+  };
 }

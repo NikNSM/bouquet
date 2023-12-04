@@ -8,7 +8,7 @@ import ContainerCatalogView from '../view/container-catalog-view.js';
 import ButtonMoreBouquetsView from '../view/button-more bouquets-view.js';
 import CardPresenter from './card-presenter.js';
 import SortingView from '../view/sorting-view.js';
-import { TypeSort, UpdateType, FilterType } from '../utils/const.js';
+import { TypeSort, UpdateType } from '../utils/const.js';
 import { render, replace, remove } from '../framework/render.js';
 import { filters } from '../utils/filter.js';
 
@@ -32,7 +32,7 @@ export default class MainPresenter {
   #cardsBouquetsPresenters = new Map();
   #favoriteBouquetsId = [];
   #renderBouquetsCount = BOUQUETS_COUNT;
-  #currentSortType = TypeSort.INCREASING
+  #currentSortType = TypeSort.INCREASING;
 
 
   constructor({model, filterModel, mainContainer, headerCountContainer}) {
@@ -46,7 +46,7 @@ export default class MainPresenter {
     });
 
     this.#model.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent)
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
@@ -62,7 +62,7 @@ export default class MainPresenter {
     const bouquets = [...this.#model.bouquets];
     const filterEventType = this.#filterModel.filterEventType;
     const filterColors = this.#filterModel.filterColors;
-    const filteredBouquets = filters(filterColors, filterEventType, bouquets)
+    const filteredBouquets = filters(filterColors, filterEventType, bouquets);
 
     switch(this.#currentSortType){
       case TypeSort.INCREASING:
@@ -73,20 +73,20 @@ export default class MainPresenter {
         break;
     }
 
-    return filteredBouquets
+    return filteredBouquets;
   }
 
   get favoriteBouquets () {
     const favoriteBouquets = this.#model.favoriteBouquets;
     if(Object.keys(favoriteBouquets).length !== 0){
-      this.#favoriteBouquetsId = Object.keys(favoriteBouquets.products)
+      this.#favoriteBouquetsId = Object.keys(favoriteBouquets.products);
     }
     return favoriteBouquets;
   }
 
   #renderHeaderCount () {
     const prevHeaderCountView = this.#headerCountView;
-    const favoriteBouquets = this.favoriteBouquets
+    const favoriteBouquets = this.favoriteBouquets;
     this.#headerCountView = new HeaderCountView({delayedBouquets: favoriteBouquets});
     if(prevHeaderCountView === null) {
       render(this.#headerCountView, this.#headerCountContainer);
@@ -96,12 +96,12 @@ export default class MainPresenter {
     replace(this.#headerCountView, prevHeaderCountView);
   }
 
-  #renderCatalogBouquets  () {
+  #renderCatalogBouquets () {
     render(this.#containerCatalog, this.#mainContainer);
     this.#listBouquetsContainer = this.#containerCatalog.element.querySelector('.container');
     this.#sortContainer = this.#listBouquetsContainer.querySelector('.catalogue__header');
     this.#renderSortComponent();
-    this.#renderListBouquets()
+    this.#renderListBouquets();
   }
 
   #renderListBouquets () {
@@ -135,29 +135,26 @@ export default class MainPresenter {
   #renderSortComponent () {
     this.#sortComponent = new SortingView ({
       onChangeSort: this.#handleChangeSort
-    })
+    });
 
-    render(this.#sortComponent, this.#sortContainer)
+    render(this.#sortComponent, this.#sortContainer);
   }
 
   #handleChangeSort = (sortType) => {
-    console.log(this.#currentSortType)
     if(sortType === this.#currentSortType){
       return;
     }
-    console.log(sortType);
-
-    this.#currentSortType = sortType
+    this.#currentSortType = sortType;
     this.#clearListBouquets();
-    this.#renderListBouquets()
-  }
+    this.#renderListBouquets();
+  };
 
   #clearListBouquets ({resetSortType = false} = {}) {
     this.#cardsBouquetsPresenters.forEach((presenter) => presenter.destroy());
     this.#cardsBouquetsPresenters.clear();
 
     if(resetSortType) {
-      this.#currentSortType = TypeSort.INCREASING
+      this.#currentSortType = TypeSort.INCREASING;
     }
 
     remove(this.#listBouquets);
@@ -188,7 +185,7 @@ export default class MainPresenter {
         this.#renderCatalogBouquets();
         break;
       case UpdateType.MAJOR:
-        this.#clearListBouquets({resetSortType: true})
+        this.#clearListBouquets({resetSortType: true});
         remove(this.#containerCatalog);
         this.#renderCatalogBouquets();
     }

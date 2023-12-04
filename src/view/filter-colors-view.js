@@ -1,8 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { FilterColors} from '../utils/const.js';
 
-
-
 function createFilterColorsViewTemplate (filters) {
   return `
   <form class="filter-color__form" action="#" method="post">
@@ -16,7 +14,7 @@ function createFilterColorsViewTemplate (filters) {
         </label>
       </div>
       <div class="filter-field-img filter-color__form-field">
-        <input class="filter-field-img__input filter-color__form-field" type="checkbox" id="filter-colors-field-id-1" name="colors" value="${FilterColors.RED}" data-filter-color="${FilterColors.RED}" ${filters.some((filter) => filter === FilterColors.RED)? 'checked' : ''}>
+        <input class="filter-field-img__input filter-color__form-field" type="checkbox" id="filter-colors-field-id-1" name="colors" value="${FilterColors.RED}" data-filter-color="${FilterColors.RED}" ${filters.some((filter) => filter === FilterColors.RED) ? 'checked' : ''}>
         <label class="filter-field-img__label" for="filter-colors-field-id-1"><span class="filter-field-img__img">
           <picture>
             <source type="image/webp" srcset="img/content/filter-red.webp, img/content/filter-red@2x.webp 2x"><img src="img/content/filter-red.png" srcset="img/content/filter-red@2x.png 2x" width="130" height="130" alt="красный">
@@ -24,7 +22,7 @@ function createFilterColorsViewTemplate (filters) {
         </label>
       </div>
       <div class="filter-field-img filter-color__form-field">
-        <input class="filter-field-img__input filter-color__form-field" type="checkbox" id="filter-colors-field-id-2" name="colors" value="${FilterColors.WHITE}" data-filter-color="${FilterColors.WHITE}" ${filters.some((filter) => filter === FilterColors.WHITE)? 'checked' : ''}>
+        <input class="filter-field-img__input filter-color__form-field" type="checkbox" id="filter-colors-field-id-2" name="colors" value="${FilterColors.WHITE}" data-filter-color="${FilterColors.WHITE}" ${filters.some((filter) => filter === FilterColors.WHITE) ? 'checked' : ''}>
         <label class="filter-field-img__label" for="filter-colors-field-id-2"><span class="filter-field-img__img">
           <picture>
             <source type="image/webp" srcset="img/content/filter-white.webp, img/content/filter-white@2x.webp 2x"><img src="img/content/filter-white.png" srcset="img/content/filter-white@2x.png 2x" width="130" height="130" alt="белый">
@@ -32,7 +30,7 @@ function createFilterColorsViewTemplate (filters) {
         </label>
       </div>
       <div class="filter-field-img filter-color__form-field">
-        <input class="filter-field-img__input filter-color__form-field" type="checkbox" id="filter-colors-field-id-3" name="colors" value="${FilterColors.LILAC}" data-filter-color="${FilterColors.LILAC}" ${filters.some((filter) => filter === FilterColors.LILAC)? 'checked' : ''}>
+        <input class="filter-field-img__input filter-color__form-field" type="checkbox" id="filter-colors-field-id-3" name="colors" value="${FilterColors.LILAC}" data-filter-color="${FilterColors.LILAC}" ${filters.some((filter) => filter === FilterColors.LILAC) ? 'checked' : ''}>
         <label class="filter-field-img__label" for="filter-colors-field-id-3"><span class="filter-field-img__img">
           <picture>
             <source type="image/webp" srcset="img/content/filter-lilac.webp, img/content/filter-lilac@2x.webp 2x"><img src="img/content/filter-lilac.png" srcset="img/content/filter-lilac@2x.png 2x" width="130" height="130" alt="сиреневый">
@@ -67,9 +65,9 @@ export default class FilterColorsView extends AbstractView {
   constructor({filters, onChangeFilter}) {
     super();
     this.#filters = filters;
-    this.#handleChangeFilter = onChangeFilter
+    this.#handleChangeFilter = onChangeFilter;
 
-    this.element.addEventListener('change', this.#changeFilterHandler)
+    this.element.addEventListener('change', this.#changeFilterHandler);
   }
 
   get template () {
@@ -78,6 +76,6 @@ export default class FilterColorsView extends AbstractView {
 
   #changeFilterHandler = (evt) => {
     evt.preventDefault();
-    this.#handleChangeFilter(evt.target.value)
-  }
+    this.#handleChangeFilter(evt.target.value);
+  };
 }

@@ -30,6 +30,6 @@ export default class CardPresenter {
   }
 
   destroy(){
-    remove(this.#cardBouqueteComponent)
+    remove(this.#cardBouqueteComponent);
   }
 }

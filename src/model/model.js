@@ -15,7 +15,7 @@ export default class Model extends Observable {
   }
 
   get favoriteBouquets () {
-    return this.#favoriteBouquets
+    return this.#favoriteBouquets;
   }
 
   async init() {
