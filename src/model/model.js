@@ -21,7 +21,7 @@ export default class Model extends Observable {
   async init() {
     try {
       const bouquets = await this.#modelApiService.bouquets;
-      const favoriteBouquets = await this.#modelApiService.delayedBouquets;
+      const favoriteBouquets = await this.#modelApiService.favoriteBouquets;
 
       this.#bouquets = bouquets;
       this.#favoriteBouquets = favoriteBouquets;
@@ -30,6 +30,31 @@ export default class Model extends Observable {
     } catch (err) {
       this.#bouquets = [];
       this.#favoriteBouquets = {};
+    }
+  }
+
+  async addToFavorite(updateType, bouquetId) {
+    try{
+      const response = await this.#modelApiService.addBouquetFavorite(bouquetId);
+      const favoriteBouquets = await this.#modelApiService.favoriteBouquets;
+
+      this.#favoriteBouquets = favoriteBouquets;
+
+      this._notify(updateType, response);
+    } catch (err) {
+      throw new Error ('Can\'t add favorite');
+    }
+  }
+
+  async deleteToFavorite (updateType, bouquetId) {
+    try {
+      await this.#modelApiService.deleteBouquetsIsFavorite(bouquetId);
+      const bouquet = this.#bouquets.find((item) => item.id === bouquetId);
+      const favoriteBouquets = await this.#modelApiService.favoriteBouquets;
+      this.#favoriteBouquets = favoriteBouquets;
+      this._notify(updateType, bouquet);
+    } catch (err) {
+      throw new Error ('Can\'t add favorite');
     }
   }
 }

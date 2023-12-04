@@ -1,6 +1,12 @@
 const UpdateType = {
   INIT: 'INIT',
+  PATH: 'path',
   MAJOR: 'major'
+};
+
+const UserAction = {
+  ADD_FAVORITE: 'add favorite',
+  DELETE_FAVORITE: 'delete favorite'
 };
 
 const TypeBouquet = {
@@ -40,4 +46,4 @@ const FilterColors = {
   PINK: 'pink'
 };
 
-export { UpdateType, TypeBouquet, TypeSort, FilterColors, FilterEventType, FilterType };
+export { UpdateType, UserAction, TypeBouquet, TypeSort, FilterColors, FilterEventType, FilterType };

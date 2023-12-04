@@ -37,14 +37,24 @@ function createCardBouquetView (bouquet, favorite) {
 export default class CardBouquetView extends AbstractView {
   #isFavorite = null;
   #bouquet = null;
+  #handleFavoriteClick = null;
 
-  constructor ({favorite, bouquet}) {
+  constructor ({favorite, bouquet, onFavoriteClick}) {
     super();
     this.#isFavorite = favorite;
     this.#bouquet = bouquet;
+    this.#handleFavoriteClick = onFavoriteClick;
+
+    this.element.querySelector('.item-card__to-fav-btn')
+      .addEventListener('click', this.#clickFavoriteHandler);
   }
 
   get template () {
     return createCardBouquetView(this.#bouquet, this.#isFavorite);
   }
+
+  #clickFavoriteHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
+  };
 }
