@@ -137,7 +137,9 @@ export default class MainPresenter {
   #renderCardBouquet = (bouquet) => {
     const bouquetPresenter = new CardPresenter({
       cardContainer: this.#listBouquets,
-      onDateChange: this.#handleActionUser
+      model: this.#model,
+      onDateChange: this.#handleActionUser,
+      onClickOpenPopup: this.#handleClickOpenPopup,
     });
     this.#cardsBouquetsPresenters.set(bouquet.id, bouquetPresenter);
     bouquetPresenter.init(bouquet, this.#favoriteBouquetsId);
@@ -181,6 +183,10 @@ export default class MainPresenter {
 
     this.#renderBouquetsCount = BOUQUETS_COUNT;
   }
+
+  #handleClickOpenPopup = () => {
+    this.#cardsBouquetsPresenters.forEach((presenter) => presenter.resetMode());
+  };
 
   #handleClickButtonMoreBouquets = () => {
     const bouquetsCount = this.bouquets.length;

@@ -1,4 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { ImageSlider } from '../utils/image-slider.js';
+import { modals, initModals } from '../modals/init-modals.js';
 import { TypeBouquet } from '../utils/const.js';
 
 function createCardBouquetView (bouquet, favorite) {
@@ -38,15 +40,19 @@ export default class CardBouquetView extends AbstractView {
   #isFavorite = null;
   #bouquet = null;
   #handleFavoriteClick = null;
+  #handleClickOpenPopup = null;
 
-  constructor ({favorite, bouquet, onFavoriteClick}) {
+  constructor ({favorite, bouquet, onFavoriteClick, onClickOpenPopup}) {
     super();
     this.#isFavorite = favorite;
     this.#bouquet = bouquet;
     this.#handleFavoriteClick = onFavoriteClick;
+    this.#handleClickOpenPopup = onClickOpenPopup;
 
     this.element.querySelector('.item-card__to-fav-btn')
       .addEventListener('click', this.#clickFavoriteHandler);
+    this.element.querySelector('.item-card__btn')
+      .addEventListener('click', this.#clickOpenPopupHandler);
   }
 
   get template () {
@@ -56,5 +62,11 @@ export default class CardBouquetView extends AbstractView {
   #clickFavoriteHandler = (evt) => {
     evt.preventDefault();
     this.#handleFavoriteClick();
+  };
+
+  #clickOpenPopupHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleClickOpenPopup();
+    modals.open('popup-data-attr');
   };
 }

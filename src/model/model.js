@@ -5,16 +5,16 @@ export default class Model extends Observable {
   #bouquets = [];
   #favoriteBouquets = {};
   #modelApiService = null;
-  constructor({modelApiService}) {
+  constructor({ modelApiService }) {
     super();
     this.#modelApiService = modelApiService;
   }
 
-  get bouquets () {
+  get bouquets() {
     return this.#bouquets;
   }
 
-  get favoriteBouquets () {
+  get favoriteBouquets() {
     return this.#favoriteBouquets;
   }
 
@@ -33,8 +33,17 @@ export default class Model extends Observable {
     }
   }
 
+  async getBoaquetPopup(bouquetId) {
+    try {
+      const bouquet = await this.#modelApiService.getBouquet(bouquetId);
+      return bouquet;
+    } catch (err) {
+      throw new Error('Can\'t get bouqute');
+    }
+  }
+
   async addToFavorite(updateType, bouquetId) {
-    try{
+    try {
       const response = await this.#modelApiService.addBouquetFavorite(bouquetId);
       const favoriteBouquets = await this.#modelApiService.favoriteBouquets;
 
@@ -42,11 +51,11 @@ export default class Model extends Observable {
 
       this._notify(updateType, response);
     } catch (err) {
-      throw new Error ('Can\'t add favorite');
+      throw new Error('Can\'t add favorite');
     }
   }
 
-  async deleteToFavorite (updateType, bouquetId) {
+  async deleteToFavorite(updateType, bouquetId) {
     try {
       await this.#modelApiService.deleteBouquetsIsFavorite(bouquetId);
       const bouquet = this.#bouquets.find((item) => item.id === bouquetId);
@@ -54,7 +63,7 @@ export default class Model extends Observable {
       this.#favoriteBouquets = favoriteBouquets;
       this._notify(updateType, bouquet);
     } catch (err) {
-      throw new Error ('Can\'t add favorite');
+      throw new Error('Can\'t delete favorite');
     }
   }
 }
