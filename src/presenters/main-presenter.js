@@ -8,6 +8,8 @@ import ContainerCatalogView from '../view/container-catalog-view.js';
 import ButtonMoreBouquetsView from '../view/button-more bouquets-view.js';
 import CardPresenter from './card-presenter.js';
 import SortingView from '../view/sorting-view.js';
+import LoadingView from '../view/loading-view.js';
+import EmptyView from '../view/empty-view.js';
 import { TypeSort, UpdateType, UserAction } from '../utils/const.js';
 import { render, replace, remove } from '../framework/render.js';
 import { filters } from '../utils/filter.js';
@@ -19,6 +21,8 @@ export default class MainPresenter {
   #advatagesView = new AdvantagesView();
   #containerCatalog = new ContainerCatalogView();
   #listBouquets = new ListBouquetsView();
+  #loadingView = new LoadingView();
+  #emptyView = new EmptyView();
   #filterModel = null;
   #sortComponent = null;
   #buttonMoreBouquets = null;
@@ -31,6 +35,7 @@ export default class MainPresenter {
   #sortContainer = null;
   #cardsBouquetsPresenters = new Map();
   #favoriteBouquetsId = [];
+  #isLoading = true;
   #renderBouquetsCount = BOUQUETS_COUNT;
   #currentSortType = TypeSort.INCREASING;
 
@@ -51,11 +56,7 @@ export default class MainPresenter {
 
   init() {
     this.#renderHeaderCount();
-    render(this.#wrapperView, this.#mainContainer);
-    render(this.#missionView, this.#mainContainer);
-    render(this.#advatagesView, this.#mainContainer);
-    this.#filterPresenter.init();
-    this.#renderCatalogBouquets();
+    this.#rendetMainBoard();
   }
 
   get bouquets() {
@@ -77,7 +78,6 @@ export default class MainPresenter {
   }
 
   get favoriteBouquets() {
-    console.log();
     const favoriteBouquets = this.#model.favoriteBouquets;
     if (Object.keys(favoriteBouquets).length !== 0) {
       this.#favoriteBouquetsId = Object.keys(favoriteBouquets.products);
@@ -97,6 +97,19 @@ export default class MainPresenter {
     replace(this.#headerCountView, prevHeaderCountView);
   }
 
+  #rendetMainBoard () {
+    if(this.#isLoading) {
+      render(this.#loadingView, this.#mainContainer);
+      return;
+    }
+
+    render(this.#wrapperView, this.#mainContainer);
+    render(this.#missionView, this.#mainContainer);
+    render(this.#advatagesView, this.#mainContainer);
+    this.#filterPresenter.init();
+    this.#renderCatalogBouquets();
+  }
+
   #renderCatalogBouquets() {
     render(this.#containerCatalog, this.#mainContainer);
     this.#listBouquetsContainer = this.#containerCatalog.element.querySelector('.container');
@@ -109,6 +122,10 @@ export default class MainPresenter {
     const bouquetsCount = this.bouquets.length;
     const bouquets = this.bouquets.slice(0, Math.min(bouquetsCount, this.#renderBouquetsCount));
 
+    if(bouquetsCount === 0) {
+      render(this.#emptyView, this.#listBouquetsContainer);
+      return;
+    }
     render(this.#listBouquets, this.#listBouquetsContainer);
     bouquets.forEach(this.#renderCardBouquet);
 
@@ -200,9 +217,10 @@ export default class MainPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.INIT:
-        remove(this.#containerCatalog);
+        this.#isLoading = false;
+        remove(this.#loadingView);
         this.#renderHeaderCount();
-        this.#renderCatalogBouquets();
+        this.#rendetMainBoard();
         break;
       case UpdateType.MAJOR:
         this.#clearListBouquets({ resetSortType: true });
