@@ -88,7 +88,6 @@ export default class MainPresenter {
   }
 
   #handleClickOpenDeferdPopup = () => {
-
     this.#popupDeferedPresenter = new PopupDeferedPresenter ({
       popupDeferdContainer: this.#mainContainer,
       model: this.#model,
@@ -104,7 +103,9 @@ export default class MainPresenter {
     const favoriteBouquets = this.favoriteBouquets;
     this.#headerCountView = new HeaderCountView({
       delayedBouquets: favoriteBouquets,
-      onClickOpenDeferedPopup: this.#handleClickOpenDeferdPopup });
+      onClickOpenDeferedPopup: this.#handleClickOpenDeferdPopup
+    });
+
     if (prevHeaderCountView === null) {
       render(this.#headerCountView, this.#headerCountContainer);
       return;
@@ -224,14 +225,14 @@ export default class MainPresenter {
         try {
           this.#model.addToFavorite(updateType, bouquetId);
         } catch (err) {
-          console.log('ошибка');
+          throw new Error();
         }
         break;
       case UserAction.DELETE_FAVORITE:
         try {
           this.#model.clearBouquetFavorite(updateType, bouquetId);
         } catch (err) {
-          console.log('ошибка');
+          throw new Error();
         }
     }
   };

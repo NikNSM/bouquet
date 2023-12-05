@@ -1,6 +1,6 @@
 import PopupDeferedView from '../view/popup-defered-view.js';
 import { remove, render, replace, RenderPosition } from '../framework/render.js';
-import { UpdateType, TypeOperation } from '../utils/const.js';
+import { TypeOperation } from '../utils/const.js';
 
 export default class PopupDeferedPresenter {
   #popupDeferedComponent = null;
@@ -32,7 +32,7 @@ export default class PopupDeferedPresenter {
     });
     if (prevPopupDeferedComponent === null) {
       document.addEventListener('keydown', this.#escKeyDownHandler);
-      render(this.#popupDeferedComponent, this.#popupDeferedContainer, RenderPosition.BEFOREBEGIN);
+      render(this.#popupDeferedComponent, this.#popupDeferedContainer, RenderPosition.AFTEREND);
       return;
     }
 
@@ -66,28 +66,28 @@ export default class PopupDeferedPresenter {
         try {
           this.#model.deleteToFavorite(updateType, data);
         } catch (err) {
-          console.log('ошибка');
+          throw new Error();
         }
         break;
       case TypeOperation.ADD_ONE:
         try {
           this.#model.addToFavorite(updateType, data);
         } catch (err) {
-          console.log('ошибка');
+          throw new Error();
         }
         break;
       case TypeOperation.CLEAR_BOUQUETE:
         try {
           this.#model.clearBouquetFavorite(updateType, data);
         } catch (err) {
-          console.log('ошибка');
+          throw new Error();
         }
         break;
       case TypeOperation.CLEAR_FAVORITE:
         try {
           this.#model.clearFavorite(updateType);
         } catch (err) {
-          console.log('ошибка');
+          throw new Error();
         }
         break;
     }

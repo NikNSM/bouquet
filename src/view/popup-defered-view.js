@@ -86,13 +86,16 @@ function creaatePopupDeferedViewTemplate (bouquets, favoriteBouquets) {
         <ul class="popup-deferred__catalog">
           ${bouquetsFavorite.map((item) => createPopupDeferedItemBouquetTemplate(item, favoriteBouquets)).join(' ')}
         </ul>
-      <div class="popup-deferred__btn-container">
-        <button class="btn btn--with-icon popup-deferred__btn-clean" type="button" data-type-operation="${TypeOperation.CLEAR_FAVORITE}" >очистить
-          <svg width="61" height="24" aria-hidden="true" data-type-operation="${TypeOperation.CLEAR_FAVORITE}" >
-            <use xlink:href="#icon-arrow" data-type-operation="${TypeOperation.CLEAR_FAVORITE}"></use>
-          </svg>
-        </button>
-      </div>
+      ${favoriteBouquets.productCount === 0
+    ? ''
+    : `<div class="popup-deferred__btn-container">
+      <button class="btn btn--with-icon popup-deferred__btn-clean" type="button" data-type-operation="${TypeOperation.CLEAR_FAVORITE}" >очистить
+        <svg width="61" height="24" aria-hidden="true" data-type-operation="${TypeOperation.CLEAR_FAVORITE}" >
+          <use xlink:href="#icon-arrow" data-type-operation="${TypeOperation.CLEAR_FAVORITE}"></use>
+        </svg>
+      </button>
+    </div>`}
+
       <div class="popup-deferred__sum">
         <p class="text text--total">Итого вы выбрали:</p>
         <div class="popup-deferred__block-wrap">
