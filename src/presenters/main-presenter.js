@@ -7,8 +7,13 @@ import ListBouquetsView from '../view/list-bouquets-view.js';
 import ContainerCatalogView from '../view/container-catalog-view.js';
 import ButtonMoreBouquetsView from '../view/button-more bouquets-view.js';
 import CardPresenter from './card-presenter.js';
-import { UpdateType } from '../utils/const.js';
+import SortingView from '../view/sorting-view.js';
+import LoadingView from '../view/loading-view.js';
+import EmptyView from '../view/empty-view.js';
+import PopupDeferedPresenter from './popup-defered-presenter.js';
+import { TypeSort, UpdateType, UserAction } from '../utils/const.js';
 import { render, replace, remove } from '../framework/render.js';
+import { filters } from '../utils/filter.js';
 
 const BOUQUETS_COUNT = 6;
 export default class MainPresenter {
@@ -17,41 +22,91 @@ export default class MainPresenter {
   #advatagesView = new AdvantagesView();
   #containerCatalog = new ContainerCatalogView();
   #listBouquets = new ListBouquetsView();
+  #loadingView = new LoadingView();
+  #emptyView = new EmptyView();
+  #popupDeferedPresenter = null;
+  #filterModel = null;
+  #sortComponent = null;
   #buttonMoreBouquets = null;
   #model = null;
   #filterPresenter = null;
   #headerCountView = null;
   #headerCountContainer = null;
   #mainContainer = null;
+  #listBouquetsContainer = null;
+  #sortContainer = null;
   #cardsBouquetsPresenters = new Map();
-  #bouquets = [];
-  #delayedBouquetsId = [];
-  #delayedBouquets = {};
+  #favoriteBouquetsId = [];
+  #isLoading = true;
   #renderBouquetsCount = BOUQUETS_COUNT;
+  #currentSortType = TypeSort.INCREASING;
 
 
-  constructor({model, mainContainer, headerCountContainer}) {
+  constructor({ model, filterModel, mainContainer, headerCountContainer }) {
     this.#model = model;
+    this.#filterModel = filterModel;
     this.#mainContainer = mainContainer;
     this.#headerCountContainer = headerCountContainer;
-    this.#filterPresenter = new FilterPresenter({mainContainer: this.#mainContainer});
+    this.#filterPresenter = new FilterPresenter({
+      mainContainer: this.#mainContainer,
+      filterModel: this.#filterModel
+    });
 
     this.#model.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
     this.#renderHeaderCount();
-    render(this.#wrapperView, this.#mainContainer);
-    render(this.#missionView, this.#mainContainer);
-    render(this.#advatagesView, this.#mainContainer);
-    this.#filterPresenter.init();
-    this.#renderListBouquets();
+    this.#rendetMainBoard();
   }
 
-  #renderHeaderCount () {
+  get bouquets() {
+    const bouquets = [...this.#model.bouquets];
+    const filterEventType = this.#filterModel.filterEventType;
+    const filterColors = this.#filterModel.filterColors;
+    const filteredBouquets = filters(filterColors, filterEventType, bouquets);
+
+    switch (this.#currentSortType) {
+      case TypeSort.INCREASING:
+        filteredBouquets.sort((a, b) => a.price - b.price);
+        break;
+      case TypeSort.DECREASING:
+        filteredBouquets.sort((a, b) => b.price - a.price);
+        break;
+    }
+
+    return filteredBouquets;
+  }
+
+  get favoriteBouquets() {
+    const favoriteBouquets = this.#model.favoriteBouquets;
+    if (Object.keys(favoriteBouquets).length !== 0) {
+      this.#favoriteBouquetsId = Object.keys(favoriteBouquets.products);
+    }
+    return favoriteBouquets;
+  }
+
+  #handleClickOpenDeferdPopup = () => {
+    this.#popupDeferedPresenter = new PopupDeferedPresenter ({
+      popupDeferdContainer: this.#mainContainer,
+      model: this.#model,
+    });
+
+    this.#cardsBouquetsPresenters.forEach((presenter) => presenter.resetMode());
+    this.#mainContainer.style.display = 'none';
+    this.#popupDeferedPresenter.init();
+  };
+
+  #renderHeaderCount() {
     const prevHeaderCountView = this.#headerCountView;
-    this.#headerCountView = new HeaderCountView({delayedBouquets: this.#delayedBouquets});
-    if(prevHeaderCountView === null) {
+    const favoriteBouquets = this.favoriteBouquets;
+    this.#headerCountView = new HeaderCountView({
+      delayedBouquets: favoriteBouquets,
+      onClickOpenDeferedPopup: this.#handleClickOpenDeferdPopup
+    });
+
+    if (prevHeaderCountView === null) {
       render(this.#headerCountView, this.#headerCountContainer);
       return;
     }
@@ -59,45 +114,101 @@ export default class MainPresenter {
     replace(this.#headerCountView, prevHeaderCountView);
   }
 
-  #renderContainerCatalog () {
-    render(this.#containerCatalog, this.#mainContainer);
+  #rendetMainBoard () {
+    if(this.#isLoading) {
+      render(this.#loadingView, this.#mainContainer);
+      return;
+    }
+
+    render(this.#wrapperView, this.#mainContainer);
+    render(this.#missionView, this.#mainContainer);
+    render(this.#advatagesView, this.#mainContainer);
+    this.#filterPresenter.init();
+    this.#renderCatalogBouquets();
   }
 
-  #renderListBouquets () {
-    const bouquetsCount = this.#bouquets.length;
-    const bouquets = this.#bouquets.slice(0, Math.min(bouquetsCount, this.#renderBouquetsCount));
+  #renderCatalogBouquets() {
+    render(this.#containerCatalog, this.#mainContainer);
+    this.#listBouquetsContainer = this.#containerCatalog.element.querySelector('.container');
+    this.#sortContainer = this.#listBouquetsContainer.querySelector('.catalogue__header');
+    this.#renderSortComponent();
+    this.#renderListBouquets();
+  }
 
-    this.#renderContainerCatalog();
-    const container = this.#containerCatalog.element.querySelector('.container');
+  #renderListBouquets() {
+    const bouquetsCount = this.bouquets.length;
+    const bouquets = this.bouquets.slice(0, Math.min(bouquetsCount, this.#renderBouquetsCount));
 
-    render(this.#listBouquets, container);
+    if(bouquetsCount === 0) {
+      render(this.#emptyView, this.#listBouquetsContainer);
+      return;
+    }
+    render(this.#listBouquets, this.#listBouquetsContainer);
     bouquets.forEach(this.#renderCardBouquet);
 
-    if(this.#renderBouquetsCount < bouquetsCount) {
+    if (this.#renderBouquetsCount < bouquetsCount) {
       this.#renderButtonMoreBouquets();
     }
   }
 
   #renderCardBouquet = (bouquet) => {
-    const bouquetPresenter = new CardPresenter ({
-      cardContainer: this.#listBouquets
-    }) ;
+    const bouquetPresenter = new CardPresenter({
+      cardContainer: this.#listBouquets,
+      model: this.#model,
+      onDateChange: this.#handleActionUser,
+      onClickOpenPopup: this.#handleClickOpenPopup,
+    });
     this.#cardsBouquetsPresenters.set(bouquet.id, bouquetPresenter);
-    bouquetPresenter.init(bouquet, this.#delayedBouquetsId);
+    bouquetPresenter.init(bouquet, this.#favoriteBouquetsId);
   };
 
-  #renderButtonMoreBouquets () {
-    this.#buttonMoreBouquets = new ButtonMoreBouquetsView ({
-      onClickButtonMoreBouquets: this.#handleClickButtonMOreBouquets
+  #renderButtonMoreBouquets() {
+    this.#buttonMoreBouquets = new ButtonMoreBouquetsView({
+      onClickButtonMoreBouquets: this.#handleClickButtonMoreBouquets
     });
 
-    render(this.#buttonMoreBouquets, this.#mainContainer);
+    render(this.#buttonMoreBouquets, this.#listBouquetsContainer);
   }
 
-  #handleClickButtonMOreBouquets = () => {
-    const bouquetsCount = this.#bouquets.length;
+  #renderSortComponent() {
+    this.#sortComponent = new SortingView({
+      onChangeSort: this.#handleChangeSort
+    });
+
+    render(this.#sortComponent, this.#sortContainer);
+  }
+
+  #handleChangeSort = (sortType) => {
+    if (sortType === this.#currentSortType) {
+      return;
+    }
+    this.#currentSortType = sortType;
+    this.#clearListBouquets();
+    this.#renderListBouquets();
+  };
+
+  #clearListBouquets({ resetSortType = false } = {}) {
+    this.#cardsBouquetsPresenters.forEach((presenter) => presenter.destroy());
+    this.#cardsBouquetsPresenters.clear();
+
+    if (resetSortType) {
+      this.#currentSortType = TypeSort.INCREASING;
+    }
+
+    remove(this.#listBouquets);
+    remove(this.#buttonMoreBouquets);
+
+    this.#renderBouquetsCount = BOUQUETS_COUNT;
+  }
+
+  #handleClickOpenPopup = () => {
+    this.#cardsBouquetsPresenters.forEach((presenter) => presenter.resetMode());
+  };
+
+  #handleClickButtonMoreBouquets = () => {
+    const bouquetsCount = this.bouquets.length;
     const newBouquetsCount = Math.min(bouquetsCount, this.#renderBouquetsCount + BOUQUETS_COUNT);
-    const bouquets = this.#bouquets.slice(this.#renderBouquetsCount, newBouquetsCount);
+    const bouquets = this.bouquets.slice(this.#renderBouquetsCount, newBouquetsCount);
 
     bouquets.forEach(this.#renderCardBouquet);
 
@@ -108,24 +219,45 @@ export default class MainPresenter {
     }
   };
 
-  #getBouquets(data){
-    this.#bouquets = data.bouquets;
-
-    if(Object.keys(data.delayedBouquets).length !== 0) {
-      this.#delayedBouquetsId = Object.keys(data.delayedBouquets.products);
-      this.#delayedBouquets = data.delayedBouquets;
+  #handleActionUser = async (actionUser, updateType, bouquetId) => {
+    switch (actionUser) {
+      case UserAction.ADD_FAVORITE:
+        try {
+          this.#model.addToFavorite(updateType, bouquetId);
+        } catch (err) {
+          throw new Error();
+        }
+        break;
+      case UserAction.DELETE_FAVORITE:
+        try {
+          this.#model.clearBouquetFavorite(updateType, bouquetId);
+        } catch (err) {
+          throw new Error();
+        }
     }
-  }
+  };
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.INIT:
-        this.#getBouquets(data);
-        remove(this.#listBouquets);
-        remove(this.#containerCatalog);
+        this.#isLoading = false;
+        remove(this.#loadingView);
         this.#renderHeaderCount();
-        this.#renderListBouquets();
+        this.#rendetMainBoard();
         break;
+      case UpdateType.MAJOR:
+        this.#clearListBouquets({ resetSortType: true });
+        remove(this.#containerCatalog);
+        this.#renderCatalogBouquets();
+        break;
+      case UpdateType.PATH:
+        this.#renderHeaderCount();
+        this.#cardsBouquetsPresenters.get(data.id).init(data, this.#favoriteBouquetsId);
+        break;
+      case UpdateType.MINOR:
+        this.#renderHeaderCount();
+        this.#clearListBouquets();
+        this.#renderListBouquets();
     }
   };
 }

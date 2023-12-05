@@ -13,7 +13,7 @@ export default class ModelApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
-  get delayedBouquets () {
+  get favoriteBouquets () {
     return this._load ({
       url: 'cart'
     })
@@ -27,7 +27,7 @@ export default class ModelApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
-  async addBouquetsOfDeferred (bouquetId) {
+  async addBouquetFavorite (bouquetId) {
     const response = await this._load({
       url: `products/${bouquetId}`,
       method: Method.PUT,
@@ -39,7 +39,7 @@ export default class ModelApiService extends ApiService {
     return parsedResponse;
   }
 
-  async deleteBouquetsIsDeferred (bouquetId) {
+  async deleteBouquetsIsFavorite(bouquetId) {
     const response = await this._load({
       url: `products/${bouquetId}`,
       method: Method.DELETE,

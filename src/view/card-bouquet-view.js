@@ -1,10 +1,11 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { modals} from '../modals/init-modals.js';
 import { TypeBouquet } from '../utils/const.js';
 
-function createCardBouquetView (bouquet, favorite) {
+function createCardBouquetView(bouquet, favorite) {
   const classFavoriteBouquet = 'is-favorite';
   const maxLengthDescription = 139;
-  const {type, title, price, previewImage, description} = bouquet;
+  const { type, title, price, previewImage, description } = bouquet;
   return `
   <li class="catalogue__item">
     <div class="item-card ${favorite ? classFavoriteBouquet : ''}">
@@ -27,7 +28,7 @@ function createCardBouquetView (bouquet, favorite) {
           <h3 class="title title--h4 item-card__title">${title}</h3>
           <div class="item-card__price-wrap"><b class="item-card__formatted-price">${price}</b><span class="item-card__currency">р</span></div>
         </div>
-        <p class="text text--size-20 item-card__desc">${description.length > maxLengthDescription ? `${description.slice(0, maxLengthDescription)}...` : description }</p>
+        <p class="text text--size-20 item-card__desc">${description.length > maxLengthDescription ? `${description.slice(0, maxLengthDescription)}...` : description}</p>
     </div>
   </li>
   `;
@@ -37,14 +38,41 @@ function createCardBouquetView (bouquet, favorite) {
 export default class CardBouquetView extends AbstractView {
   #isFavorite = null;
   #bouquet = null;
+  #handleFavoriteClick = null;
+  #handleClickOpenPopup = null;
+  #initSlider = null;
 
-  constructor ({favorite, bouquet}) {
+  constructor({ favorite, bouquet, onFavoriteClick, onClickOpenPopup, initSlider }) {
     super();
     this.#isFavorite = favorite;
     this.#bouquet = bouquet;
+    this.#handleFavoriteClick = onFavoriteClick;
+    this.#handleClickOpenPopup = onClickOpenPopup;
+    this.#initSlider = initSlider;
+
+    this.element.querySelector('.item-card__to-fav-btn')
+      .addEventListener('click', this.#clickFavoriteHandler);
+    this.element.querySelector('.item-card__btn')
+      .addEventListener('click', this.#clickOpenPopupHandler);
+
   }
 
-  get template () {
+  get template() {
     return createCardBouquetView(this.#bouquet, this.#isFavorite);
   }
+
+  #clickFavoriteHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
+  };
+
+  #clickOpenPopupHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleClickOpenPopup();
+
+    modals.open('popup-data-attr');
+    setTimeout(() => {
+      this.#initSlider();
+    }, 500);
+  };
 }
