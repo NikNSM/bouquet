@@ -21,6 +21,7 @@ const mainPresenter = new MainPresenter({model, filterModel, mainContainer, head
 model.init();
 mainPresenter.init();
 
+
 // Код для работы попапов, не удаляйте его
 window.addEventListener('DOMContentLoaded', () => {
   iosVhFix();
