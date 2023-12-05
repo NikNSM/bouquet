@@ -21,12 +21,21 @@ function createHeaderCountTemplate (delayedBouquets) {
 
 export default class HeaderCountView extends AbstractView {
   #delayedBouquets = {};
-  constructor({delayedBouquets}){
+  #handletClickOpenPopup = null;
+  constructor({delayedBouquets, onClickOpenDeferedPopup}){
     super();
     this.#delayedBouquets = delayedBouquets;
+    this.#handletClickOpenPopup = onClickOpenDeferedPopup;
+
+    this.element.addEventListener('click', this.#clickOpenPopupHandler);
   }
 
   get template() {
     return createHeaderCountTemplate(this.#delayedBouquets);
   }
+
+  #clickOpenPopupHandler = (evt) => {
+    evt.preventDefault();
+    this.#handletClickOpenPopup();
+  };
 }

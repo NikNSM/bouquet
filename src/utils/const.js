@@ -1,7 +1,8 @@
 const UpdateType = {
   INIT: 'INIT',
   PATH: 'path',
-  MAJOR: 'major'
+  MAJOR: 'major',
+  MINOR: 'minor'
 };
 
 const UserAction = {
@@ -46,4 +47,11 @@ const FilterColors = {
   PINK: 'pink'
 };
 
-export { UpdateType, UserAction, TypeBouquet, TypeSort, FilterColors, FilterEventType, FilterType };
+const TypeOperation = {
+  DELETE_ONE: 'delete one',
+  ADD_ONE: 'add one',
+  CLEAR_BOUQUETE: 'clear bouquete',
+  CLEAR_FAVORITE: 'clear favorite'
+};
+
+export { UpdateType, UserAction, TypeBouquet, TypeSort, FilterColors, FilterEventType, FilterType, TypeOperation};

@@ -10,6 +10,7 @@ import CardPresenter from './card-presenter.js';
 import SortingView from '../view/sorting-view.js';
 import LoadingView from '../view/loading-view.js';
 import EmptyView from '../view/empty-view.js';
+import PopupDeferedPresenter from './popup-defered-presenter.js';
 import { TypeSort, UpdateType, UserAction } from '../utils/const.js';
 import { render, replace, remove } from '../framework/render.js';
 import { filters } from '../utils/filter.js';
@@ -23,6 +24,7 @@ export default class MainPresenter {
   #listBouquets = new ListBouquetsView();
   #loadingView = new LoadingView();
   #emptyView = new EmptyView();
+  #popupDeferedPresenter = null;
   #filterModel = null;
   #sortComponent = null;
   #buttonMoreBouquets = null;
@@ -85,10 +87,24 @@ export default class MainPresenter {
     return favoriteBouquets;
   }
 
+  #handleClickOpenDeferdPopup = () => {
+
+    this.#popupDeferedPresenter = new PopupDeferedPresenter ({
+      popupDeferdContainer: this.#mainContainer,
+      model: this.#model,
+    });
+
+    this.#cardsBouquetsPresenters.forEach((presenter) => presenter.resetMode());
+    this.#mainContainer.style.display = 'none';
+    this.#popupDeferedPresenter.init();
+  };
+
   #renderHeaderCount() {
     const prevHeaderCountView = this.#headerCountView;
     const favoriteBouquets = this.favoriteBouquets;
-    this.#headerCountView = new HeaderCountView({ delayedBouquets: favoriteBouquets });
+    this.#headerCountView = new HeaderCountView({
+      delayedBouquets: favoriteBouquets,
+      onClickOpenDeferedPopup: this.#handleClickOpenDeferdPopup });
     if (prevHeaderCountView === null) {
       render(this.#headerCountView, this.#headerCountContainer);
       return;
@@ -213,7 +229,7 @@ export default class MainPresenter {
         break;
       case UserAction.DELETE_FAVORITE:
         try {
-          this.#model.deleteToFavorite(updateType, bouquetId);
+          this.#model.clearBouquetFavorite(updateType, bouquetId);
         } catch (err) {
           console.log('ошибка');
         }
@@ -237,6 +253,10 @@ export default class MainPresenter {
         this.#renderHeaderCount();
         this.#cardsBouquetsPresenters.get(data.id).init(data, this.#favoriteBouquetsId);
         break;
+      case UpdateType.MINOR:
+        this.#renderHeaderCount();
+        this.#clearListBouquets();
+        this.#renderListBouquets();
     }
   };
 }

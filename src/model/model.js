@@ -66,4 +66,42 @@ export default class Model extends Observable {
       throw new Error('Can\'t delete favorite');
     }
   }
+
+  async clearBouquetFavorite(updateType, bouquetId) {
+    try {
+      const arrayBouquetId = Array(this.#favoriteBouquets.products[bouquetId]).fill(bouquetId);
+      await this.deleteCyclically(arrayBouquetId);
+      const bouquet = this.#bouquets.find((item) => item.id === bouquetId);
+      const favoriteBouquets = await this.#modelApiService.favoriteBouquets;
+      this.#favoriteBouquets = favoriteBouquets;
+      this._notify(updateType, bouquet);
+    } catch (err) {
+      throw new Error('Can\'t delete favorite');
+    }
+  }
+
+  async clearFavorite(updateType) {
+    try {
+      const favoriteId = Object.keys(this.#favoriteBouquets.products);
+      const arrayFavoritsId = favoriteId.map((item) => Array(this.#favoriteBouquets.products[item]).fill(item));
+      await this.clearCyclically(arrayFavoritsId);
+      const favoriteBouquets = await this.#modelApiService.favoriteBouquets;
+      this.#favoriteBouquets = favoriteBouquets;
+      this._notify(updateType);
+    } catch (err) {
+      throw new Error('Can\'t delete favorite');
+    }
+  }
+
+  async deleteCyclically(array) {
+    for (const item of array) {
+      await this.#modelApiService.deleteBouquetsIsFavorite(item);
+    }
+  }
+
+  async clearCyclically(array) {
+    for (const item of array) {
+      await this.deleteCyclically(item);
+    }
+  }
 }
