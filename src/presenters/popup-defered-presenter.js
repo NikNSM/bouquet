@@ -56,13 +56,8 @@ export default class PopupDeferedPresenter {
     }
   };
 
-  #handleModelEvent = (updateType) => {
-    if (updateType === UpdateType.PATH) {
-      this.init();
-    }
-    if(updateType === UpdateType.MINOR) {
-
-    }
+  #handleModelEvent = () => {
+    this.init();
   };
 
   #handleOperationUser = async (typeOperation, updateType, data) => {
